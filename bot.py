@@ -105,6 +105,7 @@ async def status(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.tree.command(description="Add a server to the list")
+@app_commands.checks.has_permissions(manage_guild=True)
 async def addserver(interaction: discord.Interaction, ip: str, name: str):
     bot.config['ips'][ip] = name
     bot.server_status[ip] = False
@@ -114,6 +115,7 @@ async def addserver(interaction: discord.Interaction, ip: str, name: str):
     await interaction.response.send_message(f"Added {name} ({ip}) to the list", ephemeral=True)
 
 @bot.tree.command(description="Remove a server from the list")
+@app_commands.checks.has_permissions(manage_guild=True)
 async def removeserver(interaction: discord.Interaction, ip: str):
     name = bot.config['ips'][ip]
     del bot.config['ips'][ip]
@@ -128,6 +130,7 @@ async def autocomplete_ips(interaction: discord.Interaction, current: str):
     return [app_commands.Choice(name=name, value=ip) for ip, name in bot.config['ips'].items() if ip.startswith(current)]
 
 @bot.tree.command(description="Set the channel to send the status message in")
+@app_commands.checks.has_permissions(manage_guild=True)
 async def setchannel(interaction: discord.Interaction, channel: discord.TextChannel):
     if bot.config['channel_id'] and bot.config['message_id']:
         try:
@@ -143,6 +146,7 @@ async def setchannel(interaction: discord.Interaction, channel: discord.TextChan
     await interaction.response.send_message(f"Set the channel to {channel.mention}", ephemeral=True)
 
 @bot.tree.command(description="Set the alert when a server is offline")
+@app_commands.checks.has_permissions(manage_guild=True)
 async def setalert(interaction: discord.Interaction, channel: discord.TextChannel, message: str):
     bot.config['alert_channel_id'] = channel.id
     bot.config['message'] = message
@@ -150,6 +154,7 @@ async def setalert(interaction: discord.Interaction, channel: discord.TextChanne
     await interaction.response.send_message(f"Set the alert to {channel.mention} with message {message}", ephemeral=True)
 
 @bot.tree.command(description="Toggle showing the IP in the status message")
+@app_commands.checks.has_permissions(manage_guild=True)
 async def toggleip(interaction: discord.Interaction):
     bot.config['show_ip'] = not bot.config['show_ip']
     await update_message()
