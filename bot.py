@@ -32,7 +32,7 @@ async def get_db():
 async def load_config():
     async with bot.pool.acquire() as con:
         result = await con.fetchrow('SELECT * FROM config')
-        bot.config = dict(result) if result else {'channel_id': None, 'alert_channel_id': None, 'message_id': None, 'ips': {}, 'message': None, 'show_ip': False}
+        bot.config = dict(result) if result else {'channel_id': None, 'alert_channel_id': None, 'message_id': None, 'ips': "{}", 'message': None, 'show_ip': False}
         bot.config['ips'] = json.loads(bot.config['ips'])
 
 async def save_config():
