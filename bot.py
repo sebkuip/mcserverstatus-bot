@@ -22,6 +22,7 @@ bot: commands.Bot = commands.Bot(command_prefix='sp!', intents=discord.Intents.a
 bot.config: dict = {}
 bot.server_status = {}
 bot.players = {}
+bot.alert_sent = {}
 
 async def get_db():
     bot.pool = await asyncpg.create_pool(host=HOST, port=PORT, database=DATABASE, user=USER, password=PASSWORD)
@@ -72,11 +73,14 @@ async def check_servers():
             status = await server.async_status()
             bot.players[ip] = f"{status.players.online}/{status.players.max}"
             bot.server_status[ip] = True
+            bot.alert_sent[ip] = False
         except ConnectionRefusedError as e:
             if bot.server_status[ip]:
                 bot.server_status[ip] = False
             else:
-                await send_alert(bot.config['ips'][ip])
+                if ip in bot.alert_sent.keys() and not bot.alert_sent[ip]:
+                    await send_alert(bot.config['ips'][ip])
+                    bot.alert_sent[ip] = True
     await update_message()
 
 @bot.event
