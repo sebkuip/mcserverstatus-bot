@@ -20,6 +20,8 @@ PASSWORD = getenv('DB_PASSWORD')
 
 bot: commands.Bot = commands.Bot(command_prefix='sp!', intents=discord.Intents.all())
 bot.config: dict = {}
+bot.server_status = {}
+bot.players = {}
 
 async def get_db():
     bot.pool = await asyncpg.create_pool(host=HOST, port=PORT, database=DATABASE, user=USER, password=PASSWORD)
@@ -82,8 +84,6 @@ async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
     await get_db()
     await load_config()
-    bot.server_status = {}
-    bot.players = {}
     for ip in bot.config['ips'].keys():
         bot.server_status[ip] = True
         bot.players[ip] = "?/?"
