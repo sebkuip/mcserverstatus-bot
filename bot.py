@@ -35,7 +35,7 @@ async def get_db():
 async def load_config():
     async with bot.pool.acquire() as con:
         result = await con.fetchrow('SELECT * FROM config')
-        bot.config = dict(result) if result else {'channel_id': None, 'alert_channel_id': None, 'message_id': None, 'ips': "{}", 'message': None, 'show_ip': False}
+        bot.config = dict(result) if result else {'channel_id': None, 'alert_channel_id': None, 'message_id': None, 'ips': "{}", 'message': None, 'show_ip': False, 'maintenance': False}
         bot.config['ips'] = json.loads(bot.config['ips'])
 
 async def save_config():
@@ -61,7 +61,7 @@ async def update_message():
         await message.edit(embed=get_status_embed())
 
 async def send_alert(server: str):
-    if bot.config['alert_channel_id']:
+    if bot.config['alert_channel_id'] and not bot.config['maintenance']:
         channel = bot.get_channel(bot.config['alert_channel_id'])
         await channel.send(f"{bot.config['message'].format(server=server)}")
 
@@ -164,5 +164,12 @@ async def toggleip(interaction: discord.Interaction):
     await update_message()
     await save_config()
     await interaction.response.send_message(f"Set show_ip to {bot.config['show_ip']}", ephemeral=True)
+
+@bot.tree.command(description="Toggle maintenance mode")
+@app_commands.checks.has_permissions(manage_guild=True)
+async def maintenance(interaction: discord.Interaction):
+    bot.config['maintenance'] = not bot.config['maintenance']
+    await save_config()
+    await interaction.response.send_message(f"Set maintenance to {bot.config['maintenance']}", ephemeral=True)
 
 bot.run(TOKEN)
