@@ -57,12 +57,16 @@ def get_status_embed():
 async def update_message():
     if bot.config['channel_id'] and bot.config['message_id']:
         channel = bot.get_channel(bot.config['channel_id'])
+        if not channel:
+            return
         message = await channel.fetch_message(bot.config['message_id'])
         await message.edit(embed=get_status_embed())
 
 async def send_alert(server: str):
     if bot.config['alert_channel_id'] and not bot.config['maintenance']:
         channel = bot.get_channel(bot.config['alert_channel_id'])
+        if not channel:
+            return
         await channel.send(f"{bot.config['message'].format(server=server)}")
 
 @tasks.loop(minutes=10)
@@ -139,6 +143,8 @@ async def setchannel(interaction: discord.Interaction, channel: discord.TextChan
     if bot.config['channel_id'] and bot.config['message_id']:
         try:
             old_channel = bot.get_channel(bot.config['channel_id'])
+            if not old_channel:
+                raise discord.NotFound
             old_message = await old_channel.fetch_message(bot.config['message_id'])
             await old_message.delete()
         except discord.NotFound:
