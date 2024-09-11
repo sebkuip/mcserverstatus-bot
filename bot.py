@@ -144,10 +144,10 @@ async def setchannel(interaction: discord.Interaction, channel: discord.TextChan
         try:
             old_channel = bot.get_channel(bot.config['channel_id'])
             if not old_channel:
-                raise discord.NotFound
+                raise ValueError
             old_message = await old_channel.fetch_message(bot.config['message_id'])
             await old_message.delete()
-        except discord.NotFound:
+        except (discord.NotFound, ValueError):
             pass
     bot.config['channel_id'] = channel.id
     m = await channel.send(embed=get_status_embed())
