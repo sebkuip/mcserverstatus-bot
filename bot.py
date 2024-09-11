@@ -46,6 +46,7 @@ async def save_config():
 def get_status_embed():
     embed = discord.Embed(color=discord.Color.green())
     embed.set_author(name="Server Status", icon_url=bot.user.avatar.url)
+    embed.set_footer(text=f"Last updated {discord.utils.utcnow().strftime('%Y-%m-%d %H:%M:%S')}")
     if bot.config['show_ip']:
         for ip, name in bot.config['ips'].items():
             embed.add_field(name=f"{name} ({ip})", value=f"🟢 Online {bot.players[ip]}" if bot.server_status[ip] else "🔴 Offline", inline=False)
@@ -106,10 +107,7 @@ async def sync(ctx):
 
 @bot.tree.command(description="Get the status of the current servers")
 async def status(interaction: discord.Interaction):
-    embed = discord.Embed(color=discord.Color.green())
-    embed.set_author(name="Server Status", icon_url=bot.user.avatar.url)
-    for ip, name in bot.config['ips'].items():
-        embed.add_field(name=f"{name} ({ip})", value="🟢 Online" if bot.server_status[ip] else "🔴 Offline", inline=False)
+    embed = get_status_embed()
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.tree.command(description="Add a server to the list")
