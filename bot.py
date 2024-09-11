@@ -46,7 +46,8 @@ async def save_config():
 def get_status_embed():
     embed = discord.Embed(color=discord.Color.green())
     embed.set_author(name="Server Status", icon_url=bot.user.avatar.url)
-    embed.set_footer(text=f"Last updated {discord.utils.utcnow().strftime('%Y-%m-%d %H:%M:%S')}")
+    embed.set_footer(text="Last updated")
+    embed.timestamp = discord.utils.utcnow()
     if bot.config['show_ip']:
         for ip, name in bot.config['ips'].items():
             embed.add_field(name=f"{name} ({ip})", value=f"🟢 Online {bot.players[ip]}" if bot.server_status[ip] else "🔴 Offline", inline=False)
